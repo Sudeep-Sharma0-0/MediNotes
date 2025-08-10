@@ -1,0 +1,27 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{A9968A28-805C-431D-AC7B-65D8F87C957E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MediNotes.Api", "src\MediNotes.Api\MediNotes.Api.csproj", "{76DB36EE-EF8E-41F7-BB74-28C4A3EAEF10}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{76DB36EE-EF8E-41F7-BB74-28C4A3EAEF10}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{76DB36EE-EF8E-41F7-BB74-28C4A3EAEF10}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{76DB36EE-EF8E-41F7-BB74-28C4A3EAEF10}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{76DB36EE-EF8E-41F7-BB74-28C4A3EAEF10}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{76DB36EE-EF8E-41F7-BB74-28C4A3EAEF10} = {A9968A28-805C-431D-AC7B-65D8F87C957E}
+	EndGlobalSection
+EndGlobal

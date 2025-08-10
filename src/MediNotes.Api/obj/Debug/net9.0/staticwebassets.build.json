@@ -1,0 +1,12 @@
+{
+  "Version": 1,
+  "Hash": "dY0irEBzuVQh0pYhC7piMJdJldwngRiyG5MJhV6BqU8=",
+  "Source": "MediNotes.Api",
+  "BasePath": "_content/MediNotes.Api",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}
