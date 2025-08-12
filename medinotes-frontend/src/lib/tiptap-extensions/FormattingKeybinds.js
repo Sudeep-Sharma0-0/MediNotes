@@ -19,30 +19,37 @@ export const FormattingKeybinds = Extension.create({
       new Plugin({
         props: {
           handleKeyDown: (view, event) => {
+            const { state, dispatch } = view;
+            const { selection, doc } = state;
+            const { $from } = selection;
+
+            const insideFilename =
+              $from.parent.type.name === 'filename';
+
             if (event.key === 'Tab' && !event.defaultPrevented) {
-              const { state, dispatch } = view
               if (dispatch) {
-                dispatch(state.tr.insertText(' '.repeat(this.options.tabSize)))
+                dispatch(state.tr.insertText(' '.repeat(this.options.tabSize)));
               }
-              event.preventDefault()
-              return true
+              event.preventDefault();
+              return true;
             }
+
             if (event.key === 'Backspace' && !event.defaultPrevented) {
-              const now = Date.now()
-              const { state, dispatch } = view
-              const { selection } = state
-              if (!selection.empty) return false
+              if (!selection.empty) return false;
 
-              const $pos = selection.$from
-              const node = $pos.node()
-              const parent = $pos.parent
+              if (insideFilename) {
+                return false;
+              }
 
-              const isEmptyNode = parent.isTextblock && parent.content.size === 0
+              const now = Date.now();
+              const $pos = selection.$from;
+              const parent = $pos.parent;
+              const isEmptyNode = parent.isTextblock && parent.content.size === 0;
 
               if (!isEmptyNode) {
-                lastBackspaceTime = 0
-                lastBackspacePos = null
-                return false
+                lastBackspaceTime = 0;
+                lastBackspacePos = null;
+                return false;
               }
 
               if (
@@ -64,13 +71,14 @@ export const FormattingKeybinds = Extension.create({
                 return true;
               }
 
-              lastBackspaceTime = now
-              lastBackspacePos = $pos.pos
+              lastBackspaceTime = now;
+              lastBackspacePos = $pos.pos;
             }
-            return false
+
+            return false;
           },
         },
       }),
-    ]
+    ];
   },
 });

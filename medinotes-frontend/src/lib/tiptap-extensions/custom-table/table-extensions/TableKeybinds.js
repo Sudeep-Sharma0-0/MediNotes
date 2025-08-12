@@ -104,16 +104,11 @@ function handleDeleteKey(state, dispatch, view) {
   const allSelected = sel.from === cellStart && sel.to === cellEnd;
   const cellEmpty = cellEl.textContent.trim() === "";
 
-  if (cellEmpty && !allSelected) return true;
-
-  if (allSelected && dispatch) {
-    const schema = state.schema;
-    const emptyParagraph = schema.nodes.paragraph.create();
-    const tr = state.tr.replaceRangeWith(cellStart, cellEnd, emptyParagraph);
-    tr.setSelection(TextSelection.create(tr.doc, cellStart + 1));
-    dispatch(tr);
+  if (allSelected) {
     return true;
   }
+
+  if (cellEmpty && !allSelected) return true;
 
   return false;
 }

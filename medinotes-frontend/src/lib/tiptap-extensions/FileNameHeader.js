@@ -48,19 +48,16 @@ const Filename = Node.create({
               return false;
             }
 
-            const filenameStart = 0; // position of filename node start
-            const filenameEnd = firstNode.nodeSize; // position after filename node
+            const filenameStart = 0;
+            const filenameEnd = firstNode.nodeSize;
 
-            // Handle Ctrl+A (or Cmd+A on Mac)
             if (
               (event.key === "a" || event.key === "A") &&
               (event.ctrlKey || event.metaKey)
             ) {
-              // If cursor inside filename node
               if ($from.pos >= filenameStart && $from.pos <= filenameEnd) {
                 event.preventDefault();
 
-                // Select all content inside filename node, excluding node itself
                 const from = filenameStart + 1; // after node start
                 const to = filenameEnd - 1; // before node end
 
@@ -73,7 +70,6 @@ const Filename = Node.create({
               return false;
             }
 
-            // Prevent arrow keys moving before filename start
             if (
               (event.key === "ArrowLeft" || event.key === "ArrowUp") &&
               $from.pos <= filenameStart
@@ -82,7 +78,6 @@ const Filename = Node.create({
               return true;
             }
 
-            // Backspace/delete at start of filename node (prevent deleting node)
             if (
               (event.key === "Backspace" || event.key === "Delete") &&
               $from.pos === filenameStart
@@ -91,7 +86,6 @@ const Filename = Node.create({
               return true;
             }
 
-            // Backspace/delete at start of second node (right after filename)
             if (
               (event.key === "Backspace" || event.key === "Delete") &&
               $from.pos === filenameEnd
@@ -100,20 +94,17 @@ const Filename = Node.create({
               return true;
             }
 
-            // Backspace inside filename node when empty: do nothing
             if (
               event.key === "Backspace" &&
               $from.pos > filenameStart &&
               $from.pos <= filenameEnd
             ) {
-              // Check if filename node text content is empty
               if (firstNode.content.size === 0) {
                 event.preventDefault();
                 return true; // prevent any deletion or node creation
               }
             }
 
-            // Allow backspace/delete inside filename node normally if cursor NOT at start and filename has content
             if (
               (event.key === "Backspace" || event.key === "Delete") &&
               $from.pos > filenameStart &&
