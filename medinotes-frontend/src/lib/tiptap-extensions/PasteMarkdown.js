@@ -1,12 +1,12 @@
 import { Extension } from "@tiptap/core";
 import { Plugin } from "@tiptap/pm/state";
-import { DOMParser } from "@tiptap/pm/model";
-import MarkdownIt from "markdown-it";
+import { DOMParser as ProseMirrorDOMParser } from "@tiptap/pm/model";
+import { marked } from "marked";
 
-// Initialize a MarkdownIt parser instance
-const markdownParser = new MarkdownIt(
-  "gfm"
-);
+marked.setOptions({
+  gfm: true,
+  breaks: true,
+});
 
 const pasteMarkdown = Extension.create({
   name: "pasteMarkdown",
@@ -16,28 +16,27 @@ const pasteMarkdown = Extension.create({
       new Plugin({
         props: {
           handlePaste: (view, event) => {
-            // Get the plain text from the clipboard
             const clipboardData = event.clipboardData;
             if (!clipboardData) return false;
-            const markdownText = clipboardData.getData("text/plain");
 
-            // If there's no plain text, let the default paste handler take over
+            const markdownText = clipboardData.getData("text/plain");
             if (!markdownText) return false;
 
-            // Convert the Markdown string to an HTML string
-            const html = markdownParser.render(markdownText);
+            event.preventDefault();
 
-             const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = html;
+            (async () => {
+              const html = await marked(markdownText);
 
-            // Use ProseMirror's DOMParser to convert the HTML into a ProseMirror fragment
-            const nodes = DOMParser.fromSchema(view.state.schema).parse(tempDiv);
-            
-            // Insert the new nodes at the current selection
-            const transaction = view.state.tr.replaceSelectionWith(nodes);
-            view.dispatch(transaction);
+              const parser = ProseMirrorDOMParser.fromSchema(view.state.schema);
+              const dom = document.createElement("div");
+              dom.innerHTML = html;
 
-            // Prevent the default paste behavior
+              const slice = parser.parseSlice(dom);
+
+              const transaction = view.state.tr.replaceSelection(slice);
+              view.dispatch(transaction);
+            })();
+
             return true;
           },
         },
