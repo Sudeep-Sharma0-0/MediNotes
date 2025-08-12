@@ -13,7 +13,7 @@ const Filename = Node.create({
   addAttributes() {
     return {
       placeholder: {
-        default: "New File",
+        default: "New page",
       },
     };
   },

@@ -1,8 +1,15 @@
 import { Extension } from "@tiptap/core";
 import { Plugin } from "@tiptap/pm/state";
+import { DOMParser as ProseMirrorDOMParser } from "@tiptap/pm/model";
+import { marked } from "marked";
 import { insertCustomTableFromMatrix } from "./custom-table/commands";
 
-const PasteTable = Extension.create({
+marked.setOptions({
+  gfm: true,
+  breaks: true,
+});
+
+export const PasteTable = Extension.create({
   name: "pasteTable",
 
   addProseMirrorPlugins() {
@@ -18,7 +25,11 @@ const PasteTable = Extension.create({
               const { schema } = view.state;
               const matrix = markdownToMatrix(text);
 
-              const tableNode = insertCustomTableFromMatrix(schema, matrix);
+              const parsedMatrix = matrix.map(row =>
+                row.map(cellText => parseCellTextToNodes(schema, cellText))
+              );
+
+              const tableNode = insertCustomTableFromMatrix(schema, parsedMatrix);
               const tr = view.state.tr.replaceSelectionWith(tableNode);
 
               view.dispatch(tr.scrollIntoView());
@@ -34,7 +45,6 @@ const PasteTable = Extension.create({
 });
 
 function isMarkdownTable(text) {
-  // Detects GFM-style tables, allowing optional leading/trailing pipes
   const lines = text.trim().split("\n");
   if (lines.length < 2) return false;
 
@@ -44,32 +54,35 @@ function isMarkdownTable(text) {
   const hasPipes = header.includes("|") && separator.includes("|");
   const isSeparator = /^\s*\|?\s*[:\-]+(\s*\|\s*[:\-]+)*\s*\|?\s*$/.test(separator);
 
-  console.log("Markdown Table Detection:", {
-    hasPipes,
-    isSeparator,
-    header,
-    separator,
-  });
-
   return hasPipes && isSeparator;
 }
 
 function markdownToMatrix(md) {
   const lines = md.trim().split("\n");
 
-  if (lines.length > 1 && /^\s*\|?\s*[:\-]+(\s*\|\s*[:\-]+)*\s*\|?\s*$/.test(lines[1])) {
+  if (
+    lines.length > 1 &&
+    /^\s*\|?\s*[:\-]+(\s*\|\s*[:\-]+)*\s*\|?\s*$/.test(lines[1])
+  ) {
     lines.splice(1, 1);
   }
 
-  console.log("Markdown to Matrix Conversion:", lines);
-
   return lines.map(line =>
     line
+      .trim()
       .replace(/^\s*\|/, "")
       .replace(/\|\s*$/, "")
       .split("|")
       .map(cell => cell.trim())
   );
+}
+
+function parseCellTextToNodes(schema, markdownText) {
+  const html = marked.parse(markdownText);
+  const container = document.createElement("div");
+  container.innerHTML = html;
+  const node = ProseMirrorDOMParser.fromSchema(schema).parse(container);
+  return node;
 }
 
 export default PasteTable;
