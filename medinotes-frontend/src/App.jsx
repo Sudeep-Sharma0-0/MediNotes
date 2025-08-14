@@ -1,12 +1,8 @@
-import './App.css'
-import CustomEditor from './lib/editorSetup'
+import "./App.css";
+import { SimpleEditor } from "@/components/tiptap-templates/simple/simple-editor";
 
 function App() {
-  return (
-    <>
-      <CustomEditor />
-    </>
-  )
+  return <SimpleEditor />;
 }
 
-export default App
+export default App;
