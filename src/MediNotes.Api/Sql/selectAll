@@ -1,0 +1,28 @@
+SELECT
+  u."Uuid",
+  u."Username",
+  u."Email",
+  u."CreatedAt" AS UserCreatedAt,
+  u."UpdatedAt" AS UserUpdatedAt,
+  
+  pd."FullName",
+  pd."Address",
+  pd."DateOfBirth",
+  pd."CreatedAt" AS PersonalDataCreatedAt,
+  pd."UpdatedAt" AS PersonalDataUpdatedAt,
+  
+  ph."Hash" AS PasswordHash,
+  ph."CreatedAt" AS PasswordHashCreatedAt,
+  ph."UpdatedAt" AS PasswordHashUpdatedAt,
+  
+  img."Id" AS ImageId,
+  img."ImagePath",
+  img."ImageType",
+  img."CreatedAt" AS ImageCreatedAt,
+  img."UpdatedAt" AS ImageUpdatedAt
+
+FROM "Users" u
+LEFT JOIN "UsersPersonalData" pd ON u."Uuid" = pd."UserUuid"
+LEFT JOIN "UsersPasswordHashes" ph ON u."Uuid" = ph."UserUuid"
+LEFT JOIN "UserImages" img ON u."Uuid" = img."UserUuid"
+ORDER BY u."Username", img."Id";
