@@ -74,9 +74,11 @@ import "@/components/tiptap-templates/simple/simple-editor.scss"
 import content from "@/components/tiptap-templates/simple/data/content.json"
 
 // --- Custom Extensions ---
-import { MarkdownPaste } from "@/extensions/MarkdownPaste.js"
-import { CustomTable, CustomTableCell, CustomTableRow } from "@/extensions/table-node/CustomTable"
-import { PasteTable } from "@/extensions/table-node/PasteTable.js"
+import { MarkdownPaste } from "@/extensions/MarkdownPaste"
+import { CustomTable } from "@/extensions/table-node/table-node"
+import { CustomTableRow } from "@/extensions/table-node/table-row-node"
+import { CustomTableCell } from "@/extensions/table-node/table-cell-node"
+import { CustomTableHeader } from "@/extensions/table-node/table-header-node"
 
 const MainToolbarContent = ({
   onHighlighterClick,
@@ -86,6 +88,7 @@ const MainToolbarContent = ({
   onHighlighterClick: () => void
   onLinkClick: () => void
   isMobile: boolean
+  editor: any
 }) => {
   return (
     <>
@@ -229,13 +232,13 @@ export function SimpleEditor() {
         maxSize: MAX_FILE_SIZE,
         limit: 3,
         upload: handleImageUpload,
-        onError: (error) => console.error("Upload failed:", error),
+        onError: (error: any) => console.error("Upload failed:", error),
       }),
       MarkdownPaste,
-      CustomTableRow,
       CustomTableCell,
+      CustomTableHeader,
+      CustomTableRow,
       CustomTable,
-      PasteTable,
     ],
     content,
   })
@@ -259,8 +262,8 @@ export function SimpleEditor() {
           style={{
             ...(isMobile
               ? {
-                  bottom: `calc(100% - ${height - rect.y}px)`,
-                }
+                bottom: `calc(100% - ${height - rect.y}px)`,
+              }
               : {}),
           }}
         >
@@ -269,6 +272,7 @@ export function SimpleEditor() {
               onHighlighterClick={() => setMobileView("highlighter")}
               onLinkClick={() => setMobileView("link")}
               isMobile={isMobile}
+              editor={editor}
             />
           ) : (
             <MobileToolbarContent
