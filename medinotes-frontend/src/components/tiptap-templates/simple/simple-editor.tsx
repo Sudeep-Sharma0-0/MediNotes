@@ -75,10 +75,8 @@ import content from "@/components/tiptap-templates/simple/data/content.json"
 
 // --- Custom Extensions ---
 import { MarkdownPaste } from "@/extensions/MarkdownPaste"
-import { CustomTable } from "@/extensions/table-node/table-node"
-import { CustomTableRow } from "@/extensions/table-node/table-row-node"
-import { CustomTableCell } from "@/extensions/table-node/table-cell-node"
-import { CustomTableHeader } from "@/extensions/table-node/table-header-node"
+import "@/extensions/table-node/table-node.scss";
+import { CustomTable, CustomTableRow, CustomTableCell, CustomTableHeader } from "@/extensions/table-node/CustomTable";
 
 const MainToolbarContent = ({
   onHighlighterClick,
@@ -235,10 +233,10 @@ export function SimpleEditor() {
         onError: (error: any) => console.error("Upload failed:", error),
       }),
       MarkdownPaste,
+      CustomTable,
+      CustomTableRow,
       CustomTableCell,
       CustomTableHeader,
-      CustomTableRow,
-      CustomTable,
     ],
     content,
   })

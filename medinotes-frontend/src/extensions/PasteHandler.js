@@ -79,6 +79,7 @@ function splitMarkdownBlocks(text) {
   }
 
   flushBuffer(inTable ? "table" : "markdown");
+  console.log(blocks);
   return blocks;
 }
 
