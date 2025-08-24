@@ -1,5 +1,8 @@
-public class AuthTokenDto
+namespace MediNotes.Api.Dtos
 {
-  public string Token { get; set; }
-  public DateTime Expiration { get; set; }
+  public class AuthTokenDto
+  {
+    public string Token { get; set; } = String.Empty;
+    public DateTime Expiration { get; set; }
+  }
 }

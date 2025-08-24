@@ -1,10 +1,13 @@
 using System.ComponentModel.DataAnnotations;
 
-public class UserLoginDto
+namespace MediNotes.Api.Dtos
 {
-  [Required]
-  public string Username { get; set; }
+  public class UserLoginDto
+  {
+    [Required]
+    public string Username { get; set; } = String.Empty;
 
-  [Required]
-  public string Password { get; set; }
+    [Required]
+    public string Password { get; set; } = String.Empty;
+  }
 }

@@ -1,29 +1,48 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-public class Note
+namespace MediNotes.Api.Models
 {
-  [Key]
-  public Guid Id { get; set; }
+  public class NoteBook
+  {
+    [Key]
+    public Guid Uuid { get; set; }
 
-  [Required]
-  public Guid UserId { get; set; }
+    [Required, MaxLength(255)]
+    public String Title { get; set; } = "Notebook";
 
-  [Required]
-  public Guid MedicalSystemId { get; set; }
+    [ForeignKey("User")]
+    public Guid UserUuid { get; set; }
 
-  [Required]
-  [MaxLength(200)]
-  public string DiseaseName { get; set; }
+    [Required]
+    public DateTime CreatedAt { get; set; }
 
-  [Required]
-  public string MarkdownContent { get; set; }
+    [Required]
+    public DateTime UpdatedAt { get; set; }
 
-  public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public User? User { get; set; }
+    public ICollection<Note> Notes { get; set; } = new List<Note>();
+  }
 
-  public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+  public class Note
+  {
+    [Key]
+    public Guid Uuid { get; set; }
 
-  // Navigation properties
-  [ForeignKey(nameof(UserId))]
-  public User User { get; set; }
+    [Required, MaxLength(255)]
+    public String Title { get; set; } = "Untitled";
+
+    public List<ContentBlock> Content { get; set; } = new();
+
+    [ForeignKey("NoteBook")]
+    public Guid NoteBookUuid { get; set; }
+
+    [Required]
+    public DateTime CreatedAt { get; set; }
+
+    [Required]
+    public DateTime UpdatedAt { get; set; }
+
+    public NoteBook? NoteBook { get; set; }
+  }
 }

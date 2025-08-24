@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 
+using MediNotes.Api.Models;
+
 public class MediNotesDbContext : DbContext
 {
   public MediNotesDbContext(DbContextOptions<MediNotesDbContext> options)
@@ -11,6 +13,9 @@ public class MediNotesDbContext : DbContext
   public DbSet<UsersPersonalData> UsersPersonalData { get; set; } = null!;
   public DbSet<UsersPasswordHashes> UsersPasswordHashes { get; set; } = null!;
   public DbSet<UserImage> UserImages { get; set; } = null!;
+
+  public DbSet<NoteBook> Notebooks { get; set; } = null!;
+  public DbSet<Note> Notes { get; set; } = null!;
 
   protected override void OnModelCreating(ModelBuilder modelBuilder)
   {
@@ -34,9 +39,22 @@ public class MediNotesDbContext : DbContext
         .WithOne(img => img.User)
         .HasForeignKey(img => img.UserUuid);
 
-    // Optional: set default value for ImageType
     modelBuilder.Entity<UserImage>()
         .Property(img => img.ImageType)
         .HasDefaultValue("profile");
+
+    modelBuilder.Entity<User>()
+      .HasMany(u => u.NoteBooks)
+      .WithOne(nb => nb.User)
+      .HasForeignKey(nb => nb.UserUuid);
+
+    modelBuilder.Entity<NoteBook>()
+      .HasMany(nb => nb.Notes)
+      .WithOne(n => n.NoteBook)
+      .HasForeignKey(n => n.NoteBookUuid);
+
+    modelBuilder.Entity<Note>()
+        .Property(n => n.Content)
+        .HasColumnType("jsonb");
   }
 }
