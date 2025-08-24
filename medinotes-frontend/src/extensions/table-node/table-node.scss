@@ -1,90 +1,128 @@
-.notion-table {
-  position: relative;
-  margin: 1.5rem 0;
-  max-width: 100%;
-  overflow-x: auto;
+.custom-table {
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: var(--tt-radius-md);
+  overflow: scroll;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background-color: var(--tt-card-bg-color);
+  border: 1px solid var(--tt-card-border-color);
+  table-layout: fixed;
 
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    border-radius: var(--tt-radius-md);
-    font-size: 14px;
-    line-height: 1.4;
-    border: 1px solid var(--tt-border-color);
-    background-color: var(--tt-bg-color);
-    box-shadow: var(--tt-shadow-elevated-md);
+  .selectedCell:after {
+    background: var(--gray-2);
+    content: '';
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    pointer-events: none;
+    position: absolute;
+    z-index: 2;
+  }
 
-    tbody tr:first-child {
-      background-color: var(--tt-card-bg-color);
-      font-weight: 600;
+  .column-resize-handle {
+    background-color: var(--purple);
+    bottom: -2px;
+    pointer-events: none;
+    position: absolute;
+    right: -2px;
+    top: 0;
+    width: 4px;
+  }
 
-      td {
-        border-bottom: 2px solid var(--tt-border-color-tint);
-        color: var(--tt-color-text-gray);
+  .tableWrapper {
+    margin: 1.5rem 0;
+    overflow-x: auto;
+  }
+
+  &.resize-cursor {
+    cursor: ew-resize;
+    cursor: col-resize;
+  }
+
+  tbody {
+    div[data-node-view-content-react][data-node-view-wrapper] {
+      width: auto !important;
+    }
+
+    tr {
+      border-bottom: 1px solid var(--tt-border-color-tint);
+      transition: background-color var(--tt-transition-duration-short) var(--tt-transition-easing-default);
+
+      &:hover {
+        background-color: var(--tt-gray-light-a-50);
       }
     }
 
-    tr+tr {
-      border-top: 1px solid var(--tt-border-color-tint);
+    th {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--tt-border-color);
+      text-align: left; // default, can be overridden by alignment classes
+      color: var(--tt-color-text-gray);
+      box-sizing: border-box;
+      position: relative;
     }
 
     td {
-      padding: 8px 12px;
-      border-right: 1px solid var(--tt-border-color-tint);
-      min-height: 36px;
-      vertical-align: top;
+      padding: 10px 12px;
+      text-align: left; // default, overridden by alignment classes
       color: var(--tt-color-text-gray);
 
-      &:last-child {
-        border-right: none;
+      pre {
+        font-size: 0.85em;
+        background-color: var(--tt-gray-light-a-50);
+        padding: 4px 6px;
+        border-radius: var(--tt-radius-xs);
+        overflow-x: auto;
       }
 
-      &:focus-within {
-        background-color: var(--tt-color-highlight-blue);
-        outline: 1px solid var(--tt-cursor-color);
-        outline-offset: -1px;
-      }
-    }
-  }
+      a {
+        color: var(--tt-cursor-color);
+        text-decoration: none;
 
-  .column-controls,
-  .row-controls,
-  .bottom-controls {
-    display: flex;
-    gap: 0.25rem;
-
-    .table-control-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 1.25rem;
-      height: 1.25rem;
-      border-radius: var(--tt-radius-xs);
-      border: none;
-      background: transparent;
-      cursor: pointer;
-      color: var(--tt-color-text-gray);
-
-      &:hover {
-        background-color: var(--tt-color-highlight-gray);
-        color: var(--tt-color-text-blue);
-      }
-
-      &.delete-btn:hover {
-        color: var(--tt-color-text-red);
+        &:hover {
+          text-decoration: underline;
+        }
       }
     }
-  }
-}
 
-/* Responsive font & cell padding */
-@media (max-width: 768px) {
-  .notion-table table {
-    font-size: 12px;
-  }
+    /* Dark mode override */
+    .dark {
+      .custom-table {
+        background-color: var(--tt-card-bg-color);
+        border: 1px solid var(--tt-card-border-color);
 
-  .notion-table td {
-    padding: 6px 8px;
-    min-height: 32px;
+        tbody {
+          div[data-node-view-content-react][data-node-view-wrapper] {
+            width: auto !important;
+          }
+
+          tr {
+            border-bottom: 1px solid var(--tt-border-color-tint);
+
+            &:hover {
+              background-color: var(--tt-gray-dark-a-50);
+            }
+          }
+
+          th {
+            border-bottom: 1px solid var(--tt-border-color);
+            color: var(--tt-color-text-gray);
+          }
+
+          td {
+            color: var(--tt-color-text-gray);
+
+            pre {
+              background-color: var(--tt-gray-dark-a-50);
+            }
+
+            a {
+              color: var(--tt-cursor-color);
+            }
+          }
+        }
+      }
+    }
   }
 }

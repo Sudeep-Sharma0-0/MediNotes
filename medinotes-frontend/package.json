@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
@@ -20,6 +20,7 @@
     "@tiptap/extension-list": "^3.1.0",
     "@tiptap/extension-subscript": "^3.1.0",
     "@tiptap/extension-superscript": "^3.1.0",
+    "@tiptap/extension-table": "^3.2.0",
     "@tiptap/extension-text-align": "^3.1.0",
     "@tiptap/extension-typography": "^3.1.0",
     "@tiptap/extensions": "^3.1.0",

@@ -55,13 +55,12 @@ body,
 }
 
 .simple-editor-wrapper {
-  width: 100vw;
   height: 100vh;
   overflow: auto;
 }
 
 .simple-editor-content {
-  max-width: 648px;
+  max-width: 75%;
   width: 100%;
   margin: 0 auto;
   height: 100%;

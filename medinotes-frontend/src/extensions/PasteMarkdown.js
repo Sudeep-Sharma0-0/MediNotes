@@ -26,3 +26,51 @@ export function pasteMarkdown(view, text) {
 
   view.dispatch(tr.scrollIntoView());
 }
+
+/** Return Markdown back to the caller*/
+export function returnMarkdown(parser, text) {
+  const cleanedText = text.replace(/\\\|/g, "|");
+  const lineSplitted = cleanedText.split("<br>");
+
+  let unorderedList, orderedList;
+  if (lineSplitted.length < 1) {
+    unorderedList = false;
+    orderedList = false;
+  } else {
+    unorderedList = lineSplitted[0].startsWith("-") ||
+      lineSplitted[0].startsWith("*") ||
+      lineSplitted[0].startsWith("+");
+    orderedList = /^\d/.test(lineSplitted[0]);
+  }
+
+  let partialHtml = "";
+  if (unorderedList || orderedList) {
+    let openingContTag = orderedList ? "<ol>" : "<ul>";
+    let closingContTag = orderedList ? "</ol>" : "</ul>";
+    let openingTag = "<li>";
+    let closingTag = "</li>";
+
+    partialHtml += openingContTag;
+
+    lineSplitted.forEach(element => {
+      element = element.trim();
+
+      let cleanedElement;
+      if (unorderedList) {
+        cleanedElement = element.replace(/^(\-|\*|\+)\s+/, "");
+      } else if (orderedList) {
+        cleanedElement = element.replace(/^\d+\.\s+/, "");
+      } else {
+        cleanedElement = element.trim();
+      }
+      partialHtml += `${openingTag}${cleanedElement}${closingTag}`
+    });
+    partialHtml += closingContTag;
+  }
+
+  const html = partialHtml == "" || partialHtml.length < 1 ? marked(cleanedText) : partialHtml;
+  const container = document.createElement("div");
+  container.innerHTML = html;
+
+  return parser.parse(container, { preserveWhitespace: true }).content;
+}

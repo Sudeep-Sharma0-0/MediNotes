@@ -1,54 +1,81 @@
 import { DOMParser as ProseMirrorDOMParser } from "prosemirror-model";
 import { marked } from "marked";
-import { NodeSelection } from "prosemirror-state";
+import { TextSelection } from "prosemirror-state";
+import { returnMarkdown } from "./PasteMarkdown";
 
+marked.use({
+  gfm: true,
+  breaks: true,
+});
 /**
- * Handles pasting a Markdown table as ProseMirror table nodes.
- * Each cell content is parsed as Markdown.
+ * Paste a Markdown table into a Tiptap editor using CustomTable extensions
  * @param {import("prosemirror-view").EditorView} view
- * @param {string} text - Markdown table text
+ * @param {string} text - Markdown table string
  */
 export function pasteTable(view, text) {
-  const { customTable, customTableRow, customTableCell, customTableHeader } = view.state.schema.nodes;
-  const parser = ProseMirrorDOMParser.fromSchema(view.state.schema);
+  const { schema } = view.state;
+  const Table = schema.nodes.table;
+  const TableRow = schema.nodes.tableRow;
+  const TableCell = schema.nodes.tableCell;
+  const TableHeader = schema.nodes.tableHeader;
+  const parser = ProseMirrorDOMParser.fromSchema(schema);
 
-  const lines = text.split("\n")
-    .map(line => line.trim())
-    .filter(line => line && !/^[\|\-\s:]+$/.test(line));
+  const rawLines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+  if (rawLines.length < 2) return;
 
-  if (lines.length < 2) return;
-
-  const parseCellContent = (cellText) => {
-    const html = marked(cellText); // convert Markdown to HTML
-    const container = document.createElement("div");
-    container.innerHTML = html;
-    const doc = parser.parse(container, { preserveWhitespace: true });
-    return doc.content;
+  const parseAlignmentRow = line => {
+    const cells = line.replace(/^\||\|$/g, "").split("|").map(c => c.trim());
+    return cells.map(c => {
+      if (!/-/.test(c)) return "left";
+      const startsColon = c.startsWith(":");
+      const endsColon = c.endsWith(":");
+      if (startsColon && endsColon) return "center";
+      if (endsColon) return "right";
+      return "left";
+    });
   };
 
-  const splitCells = (line) => line.split("|").map(cell => parseCellContent(cell.trim()));
+  const parseCellContent = cellText => {
+    return returnMarkdown(parser, cellText);
+  };
 
-  // Header row
-  const headerCells = splitCells(lines[0]).map(fragment => customTableHeader.create({}, fragment));
-  const headerRow = customTableRow.create({}, headerCells);
+  const splitCells = line => {
+    const trimmed = line.trim().replace(/^\||\|$/g, "");
+    return trimmed.split("|").map(c => parseCellContent(c.trim()));
+  };
 
-  // Body rows
-  const bodyRows = lines.slice(1).map(line => {
-    const cells = splitCells(line).map(fragment => customTableCell.create({}, fragment));
-    return customTableRow.create({}, cells);
+  const potentialAlignRow = rawLines[1];
+  let alignments = [];
+  let dataStartIndex = 1;
+
+  if (/^[:\-\s|]+$/.test(potentialAlignRow) && /-/.test(potentialAlignRow)) {
+    alignments = parseAlignmentRow(potentialAlignRow);
+    dataStartIndex = 2;
+  } else {
+    const firstRowCells = rawLines[0].replace(/^\||\|$/g, "").split("|");
+    alignments = firstRowCells.map(() => "left");
+  }
+
+  const headerCells = splitCells(rawLines[0]).map((fragment, i) =>
+    TableHeader.create({ class: `text-${alignments[i]}` }, fragment)
+  );
+  const headerRow = TableRow.create({}, headerCells);
+
+  const bodyRows = rawLines.slice(dataStartIndex).map(line => {
+    const cells = splitCells(line).map((fragment, i) =>
+      TableCell.create({ class: `text-${alignments[i]}` }, fragment)
+    );
+    return TableRow.create({}, cells);
   });
 
-  const tableNode = customTable.create({}, [headerRow, ...bodyRows]);
+  const tableNode = Table.create({}, [headerRow, ...bodyRows]);
 
-  let { tr, selection } = view.state;
-
-  // Insert table at selection
+  let { tr } = view.state;
   tr = tr.replaceSelectionWith(tableNode);
 
-  // Move cursor immediately after the table
-  const afterTablePos = tr.selection.from + tableNode.nodeSize;
-  const resolvedPos = tr.doc.resolve(Math.min(afterTablePos, tr.doc.content.size));
-  tr = tr.setSelection(selection.constructor.near(resolvedPos));
+  const after = tr.selection.from + tableNode.nodeSize;
+  const resolved = tr.doc.resolve(Math.min(after, tr.doc.content.size));
+  tr = tr.setSelection(TextSelection.near(resolved));
 
   view.dispatch(tr.scrollIntoView());
 }
