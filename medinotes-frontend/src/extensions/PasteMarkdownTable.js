@@ -1,7 +1,12 @@
 import { DOMParser as ProseMirrorDOMParser } from "prosemirror-model";
 import { marked } from "marked";
 import { TextSelection } from "prosemirror-state";
+import { returnMarkdown } from "./PasteMarkdown";
 
+marked.use({
+  gfm: true,
+  breaks: true,
+});
 /**
  * Paste a Markdown table into a Tiptap editor using CustomTable extensions
  * @param {import("prosemirror-view").EditorView} view
@@ -31,10 +36,7 @@ export function pasteTable(view, text) {
   };
 
   const parseCellContent = cellText => {
-    const html = marked(cellText.replace(/\\\|/g, "|"));
-    const container = document.createElement("div");
-    container.innerHTML = html;
-    return parser.parse(container, { preserveWhitespace: true }).content;
+    return returnMarkdown(parser, cellText);
   };
 
   const splitCells = line => {

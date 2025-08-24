@@ -187,7 +187,12 @@ const MobileToolbarContent = ({
   </>
 )
 
-export function SimpleEditor() {
+type SimpleEditorProps = {
+  fileName: string;
+  content: string;
+  onContentChange: (newContent: string) => void;
+}
+export const SimpleEditor = ({ fileName, content, onContentChange }: SimpleEditorProps) => {
   const isMobile = useIsMobile()
   const { height } = useWindowSize()
   const [mobileView, setMobileView] = React.useState<
@@ -233,13 +238,26 @@ export function SimpleEditor() {
         onError: (error: any) => console.error("Upload failed:", error),
       }),
       MarkdownPaste,
-      CustomTable,
+      CustomTable.configure({
+        resizable: false,
+        lastColumnResizable: false,
+        allowTableNodeSelection: true,
+      }),
       CustomTableRow,
       CustomTableCell,
       CustomTableHeader,
     ],
-    content,
+    content: content,
+    onUpdate: ({ editor }) => {
+      onContentChange(editor.getHTML());
+    },
   })
+
+  React.useEffect(() => {
+    if (editor && editor.getHTML() !== content) {
+      editor.commands.setContent(content);
+    }
+  }, [content, editor]);
 
   const rect = useCursorVisibility({
     editor,
